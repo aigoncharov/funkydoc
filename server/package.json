@@ -13,7 +13,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "dependencies": {
     "fastify": "^3.0.0",
     "fastify-plugin": "^3.0.0",
