@@ -9,7 +9,7 @@ export interface DocNodeProcessed {
   health: { status: 'success' } | { status: 'warn'; message: string } | { status: 'danger'; message: string }
 }
 
-interface Config {
+export interface Config {
   maxRoots: {
     warn: number
     danger: number
@@ -35,4 +35,15 @@ export interface ProcessorOutput {
 }
 
 // TODO: Implement me
-export const process = (parserOutput: ParserOutput, config: Config): Promise<ProcessorOutput> => {}
+export const process = (parserOutput: ParserOutput, config: Config): ProcessorOutput => {
+  return {
+    docs: {
+      nodes: [],
+      health: {
+        status: 'success',
+      },
+    },
+    entryPoint: parserOutput.entryPoint,
+    config,
+  }
+}

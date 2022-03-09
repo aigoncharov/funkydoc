@@ -2,6 +2,9 @@
   "name": "funkydoc",
   "version": "1.0.0",
   "description": "",
+  "bin": {
+    "funkydoc": "dist/bin.js"
+  },
   "main": "dist/index.js",
   "scripts": {
     "test": "npx jest",

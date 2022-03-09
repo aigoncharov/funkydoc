@@ -11,4 +11,9 @@ export interface ParserOutput {
 }
 
 // TODO: Implement me
-export const parse = async (entryPoint: string): Promise<Output> => {}
+export const parse = async (entryPoint: string): Promise<ParserOutput> => {
+  return {
+    nodes: [],
+    entryPoint,
+  }
+}
