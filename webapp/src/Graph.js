@@ -24,7 +24,7 @@ function Graph(props) {
           "link",
           d3.forceLink(links).id((d) => d.id)
         )
-        .force("charge", d3.forceManyBody().strength(-radius * 2))
+        .force("charge", d3.forceManyBody().strength(-data.length * 10))
         .force("radial", d3.forceRadial(radius, 0, 0))
         .force("x", d3.forceX())
         .force("y", d3.forceY());
@@ -93,7 +93,7 @@ function Graph(props) {
         d3.selectAll("g").attr("transform", e.transform);
         node.attr("transform", (d) => `translate(${d.x},${d.y})`);
       }
-      const zoom = d3.zoom().on("zoom", handleZoom).scaleExtent([0.75, 2]);
+      const zoom = d3.zoom().on("zoom", handleZoom).scaleExtent([0.25, 2]);
       svg.call(zoom);
     },
     [data.length]
