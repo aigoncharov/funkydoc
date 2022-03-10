@@ -24,28 +24,38 @@ export interface ProcessorOutput {
 }
 
 export const process = ({ entryPoint, nodes }: ParserOutput, config: Config): ProcessorOutput => {
-  const nodesProcessed: DocNodeProcessed[] = nodes.map((node) => {
-    const processed: DocNodeProcessed = {
-      ...node,
-      health: { status: 'success' },
-    }
-
-    if (!node.edgesIn) {
-      processed.health = {
-        status: 'warn',
-        message: 'Page has no links to it',
+  const nodesProcessed: DocNodeProcessed[] = nodes
+    .map((node) => {
+      const processed: DocNodeProcessed = {
+        ...node,
+        health: { status: 'success' },
       }
 
-      if (!node.edgesOut) {
+      if (!node.edgesIn.length) {
         processed.health = {
-          status: 'danger',
-          message: 'Isolated page. Page has no links to it and from it.',
+          status: 'warn',
+          message: 'Page has no links to it',
+        }
+
+        if (!node.edgesOut.length) {
+          processed.health = {
+            status: 'danger',
+            message: 'Isolated page. Page has no links to it and from it.',
+          }
         }
       }
-    }
 
-    return processed
-  })
+      return processed
+    })
+    // TODO: Make customizable
+    .filter((node) => node.id.startsWith('/docs/'))
+    .map((node) => ({
+      ...node,
+      edgesIn: node.edgesIn.filter((node) => node.startsWith('/docs/')),
+      edgesOut: node.edgesIn.filter((node) => node.startsWith('/docs/')),
+    }))
+
+  nodesProcessed
 
   return {
     docs: {

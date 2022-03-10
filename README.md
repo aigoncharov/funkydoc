@@ -19,10 +19,11 @@
 
 1. cd `cli`
 1. `npm i -g .`
-1. `funkydoc`
+1. `funkydoc input-graph.json output-graph.json`
 
 ### Webapp
 
 #### Setup & Run
+
 1. `npm install`
 2. `npm start`
