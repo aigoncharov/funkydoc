@@ -20,3 +20,9 @@
 1. cd `cli`
 1. `npm i -g .`
 1. `funkydoc`
+
+### Webapp
+
+#### Setup & Run
+1. `npm install`
+2. `npm start`
