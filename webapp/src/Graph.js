@@ -9,11 +9,7 @@ function Graph(props) {
     const nodes = createNodes(data);
     const links = createLinks(data);
     const types = Array.from(new Set(links.map(d => d.type)))
-    const connections = Array.from(new Set(nodes.map(d => d.connections)))
     const color = d3.scaleOrdinal(types, d3.schemeCategory10)
-    const nodeColor = d3.scaleOrdinal(connections, d3.schemeCategory10)
-    console.log(nodeColor)
-    console.log(d3.schemeCategory10)
 
     const ref = useD3(
         (svg) => {
@@ -82,7 +78,17 @@ function Graph(props) {
                 node.attr("transform", d => `translate(${d.x},${d.y})`);
             });
 
-            // invalidation.then(() => simulation.stop());
+            // zoom & panning
+            function handleZoom(e) {
+                d3.selectAll('g')
+                    .attr('transform', e.transform);
+                node.attr("transform", d => `translate(${d.x},${d.y})`);
+            }
+            const zoom = d3.zoom()
+                .on('zoom', handleZoom)
+                .scaleExtent([0.75, 2]);
+            svg.call(zoom);
+
         },
         [data.length]
     );
@@ -97,13 +103,10 @@ function Graph(props) {
                 width: "100%",
                 marginRight: "0px",
                 marginLeft: "0px",
-                font: "12px sans-serif",
+                font: "10px sans-serif",
                 outline: "solid 1px red",
             }}
         >
-            <g className="plot-area" />
-            <g className="x-axis" />
-            <g className="y-axis" />
         </svg>
     );
 }
