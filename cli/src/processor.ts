@@ -4,24 +4,13 @@ export interface DocNodeProcessed {
   id: string
   title: string
   edgesIn: string[]
-  edgedOut: string[]
+  edgesOut: string[]
   // Used in the UI to highlight unhealthy nodes
   health: { status: 'success' } | { status: 'warn'; message: string } | { status: 'danger'; message: string }
 }
 
 export interface Config {
-  maxRoots: {
-    warn: number
-    danger: number
-  }
-  edgesIn: {
-    warn: number
-    danger: number
-  }
-  edgesOut: {
-    warn: number
-    danger: number
-  }
+  // TODO: Implement me
 }
 
 export interface ProcessorOutput {
@@ -34,16 +23,38 @@ export interface ProcessorOutput {
   config: Config
 }
 
-// TODO: Implement me
-export const process = (parserOutput: ParserOutput, config: Config): ProcessorOutput => {
+export const process = ({ entryPoint, nodes }: ParserOutput, config: Config): ProcessorOutput => {
+  const nodesProcessed: DocNodeProcessed[] = nodes.map((node) => {
+    const processed: DocNodeProcessed = {
+      ...node,
+      health: { status: 'success' },
+    }
+
+    if (!node.edgesIn) {
+      processed.health = {
+        status: 'warn',
+        message: 'Page has no links to it',
+      }
+
+      if (!node.edgesOut) {
+        processed.health = {
+          status: 'danger',
+          message: 'Isolated page. Page has no links to it and from it.',
+        }
+      }
+    }
+
+    return processed
+  })
+
   return {
     docs: {
-      nodes: [],
+      nodes: nodesProcessed,
       health: {
         status: 'success',
       },
     },
-    entryPoint: parserOutput.entryPoint,
+    entryPoint,
     config,
   }
 }
