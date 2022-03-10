@@ -19,7 +19,7 @@
 
 1. cd `cli`
 1. `npm i -g .`
-1. `funkydoc input-graph.json output-graph.json`
+1. `funkydoc graph.json out.json`
 
 ### Webapp
 
