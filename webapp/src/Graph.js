@@ -10,6 +10,11 @@ function Graph(props) {
   const types = Array.from(new Set(links.map((d) => d.type)));
   const color = d3.scaleOrdinal(types, d3.schemeCategory10);
 
+  const defaultcolor = "#1f77b4"
+  const colorin = "#00f"
+  const colorout = "#f00"
+  const colornone = "#ccc"
+
   const ref = useD3(
     (svg) => {
       const svgElement = svg._groups[0][0].getBoundingClientRect();
@@ -63,7 +68,7 @@ function Graph(props) {
         .selectAll("g")
         .data(nodes)
         .join("g")
-        .call(drag(simulation));
+        .call(drag(simulation))
 
       node
         .append("circle")
@@ -95,6 +100,49 @@ function Graph(props) {
       }
       const zoom = d3.zoom().on("zoom", handleZoom).scaleExtent([0.25, 2]);
       svg.call(zoom);
+
+      // highlight paths on hover in
+      function overed(event, d) {
+        d3.select(this).attr("font-weight", "bold");
+
+        const paths = d3.selectAll("path")
+        const outgoing = paths.filter(p => p?.source?.id === d.id)
+        const incoming = paths.filter(p => p?.target?.id === d.id)
+        // highlight paths
+        paths.attr("stroke", colornone)
+        outgoing.raise();
+        outgoing.attr("stroke", colorout)
+        incoming.raise();
+        incoming.attr("stroke", colorin)
+
+        // hide non-adjacent node text
+        const adjacentNodeText =
+          outgoing._groups[0].map(p => p?.__data__?.target?.id)
+          .concat(incoming._groups[0].map(p => p?.__data__?.source.id))
+        const text = d3.selectAll("text").filter(t => !adjacentNodeText.includes(t.id) && t.id !== d.id)
+        text.style("visibility", "hidden")
+      }
+
+      // reset on hover out
+      function outed(event, d) {
+        d3.select(this).attr("font-weight", null);
+
+        const paths = d3.selectAll("path")
+        const outgoing = paths.filter(p => p?.source?.id === d.id)
+        const incoming = paths.filter(p => p?.target?.id === d.id)
+        // return to default
+        paths.attr("stroke", defaultcolor)
+        outgoing.attr("stroke", null)
+        incoming.attr("stroke", null)
+
+        // reveal all node text
+        const text = d3.selectAll("text")
+        text.style("visibility", "visible")
+      }
+
+      node
+      .on("mouseover", overed)
+      .on("mouseout", outed)
     },
     [data.length]
   );
