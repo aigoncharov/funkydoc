@@ -109,12 +109,12 @@ function Graph(props) {
         width: "100%",
         marginRight: "0px",
         marginLeft: "0px",
-        font: "10px sans-serif",
-        outline: "solid 1px red",
+        font: "12px sans-serif",
       }}
     ></svg>
   );
 }
+
 
 // arc for edges
 function linkArc(d) {
@@ -158,9 +158,9 @@ const drag = (simulation) => {
 
   return d3
     .drag()
-    .on("start", dragstarted)
-    .on("drag", dragged)
-    .on("end", dragended);
+    // .on('start', dragstarted)
+    // .on('drag', dragged)
+    // .on('end', dragended)
 };
 
 export default Graph;

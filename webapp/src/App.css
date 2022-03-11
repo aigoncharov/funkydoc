@@ -5,11 +5,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: clip;
+  overscroll-behavior: none;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.Header {
+  font-size: 1rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -42,9 +43,39 @@
   }
 }
 
+.Body {
+  height: 100%;
+  width: 100%;
+  overflow: clip;
+  overscroll-behavior: none;
+  display: flex;
+  flex-direction: row;
+
+}
+
 .Graph {
   height: 100%;
   width: 100%;
-  outline: dashed 1px black;
-  flex-grow: 4;
+}
+
+.SidebarRoot {
+  cursor: pointer;
+  width: 250px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 0.5em;
+  border-right: solid 1px grey;
+  overflow: scroll;
+}
+
+.SidebarItem {
+  pointer: cursor;
+  color: #242526;
+  font-size: 12px;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  width: 100%;
+  border-bottom: solid 1px grey;
 }
