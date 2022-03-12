@@ -52,8 +52,7 @@ const SidebarItem = node => {
         const selectedNode = d3.selectAll('svg g')
             .filter(e => e?.title === node.title)
         selectedNode
-            .attr("stroke", "red")
-            .attr("stroke-width", 0.5)
+            .attr("font-weight", "bold")
             .style("visibility", "visible")
     }
 
@@ -63,7 +62,7 @@ const SidebarItem = node => {
         const selectedNode = d3.selectAll('svg g')
             .filter(e => e?.title === node.title)
         selectedNode
-            .attr("stroke", "black")
+            .attr("font-weight", null)
             .attr("stroke-width", 0.1)
     }
 
