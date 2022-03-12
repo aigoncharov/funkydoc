@@ -24,25 +24,44 @@ const SidebarItem = node => {
         const commaIdx = coordinates.indexOf(",")
         const x = parseFloat( coordinates.substring(10, commaIdx) )
         const y = parseFloat( coordinates.substring(commaIdx+1, coordinates.indexOf(")")) )
-        console.log(x, y)
 
         // navigate to coordinates
         const svg = d3.select('svg')
-        const transform = d3.zoomIdentity.translate(-x, -y).scale(1);
-        console.log("before", svg._groups[0][0].__zoom)
+        const transform = d3.zoomIdentity
+            .scale(0.75)
+            .translate(-x, -y);
         svg.call(d3.zoom().transform, transform);
-        console.log("after", svg._groups[0][0].__zoom)
+
+        // trigger wheel event on svg to update zoom state on all d3 elements
+        const wheel = new WheelEvent("wheel", {
+            bubbles: true,
+            canceable: true,
+            view: window,
+            wheelDeltaY: 1,
+        })
+        const svgElement = document.getElementById("svg")
+        svgElement.dispatchEvent(wheel)
     }
 
     function highlightNode() {
-        const selectedNode = d3.selectAll('svg g').filter(e => e?.title === node.title)
+        d3.selectAll("text")
+            .filter(t => t.id !== node.id)
+            .style("visibility", "hidden")  // hide all text
+
+
+        const selectedNode = d3.selectAll('svg g')
+            .filter(e => e?.title === node.title)
         selectedNode
             .attr("stroke", "red")
             .attr("stroke-width", 0.5)
+            .style("visibility", "visible")
     }
 
     function unhighlightNode() {
-        const selectedNode = d3.selectAll('svg g').filter(e => e?.title === node.title)
+        d3.selectAll("text").style("visibility", "visible")
+
+        const selectedNode = d3.selectAll('svg g')
+            .filter(e => e?.title === node.title)
         selectedNode
             .attr("stroke", "black")
             .attr("stroke-width", 0.1)
