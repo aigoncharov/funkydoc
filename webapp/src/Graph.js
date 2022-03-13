@@ -34,7 +34,7 @@ function Graph(props) {
         .force("x", d3.forceX())
         .force("y", d3.forceY());
 
-      // Per-type markers, as they don't inherit styles.
+      // Blue arrowhead markers (points to a node)
       svg
         .append("defs")
         .selectAll("marker")
@@ -49,6 +49,23 @@ function Graph(props) {
         .attr("orient", "auto")
         .append("path")
         .attr("fill", colorDefault)
+        .attr("d", "M0,-5L10,0L0,5");
+
+        // Red arrowhead markers
+        svg
+        .append("defs")
+        .selectAll("marker")
+        .data(links)
+        .join("marker")
+        .attr("id", (d) => `arrow-${d.source.id}+${d.target.id}-red`)
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 15)
+        .attr("refY", -0.5)
+        .attr("markerWidth", 4)
+        .attr("markerHeight", 4)
+        .attr("orient", "auto")
+        .append("path")
+        .attr("fill", colorOutgoing)
         .attr("d", "M0,-5L10,0L0,5");
 
       const link = svg
@@ -129,6 +146,10 @@ function Graph(props) {
         // hide non-adjacent markers
         const markers = d3.selectAll("marker").filter(m => m?.source?.id !== d.id && m?.target?.id !== d.id)
         markers.style("visibility", "hidden")
+
+        // change outgoing arrowhead markers to red
+        outgoing
+          .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id}-red)`);
       }
 
       function click(event, d) {
@@ -151,6 +172,10 @@ function Graph(props) {
         // hide non-adjacent markers
         const marker = d3.selectAll("marker")
         marker.style("visibility", "visible")
+
+        // return arrowhead marker colors to default
+        paths
+          .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id})`);
       }
 
       node
