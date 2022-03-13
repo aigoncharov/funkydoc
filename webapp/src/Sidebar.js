@@ -5,7 +5,6 @@ import {overedImpl, outedImpl, setPersist} from "./Util";
 
 function Sidebar(props) {
     const suspiciousNodes = props.data.filter(node => node.health.status !== "success")
-    console.log(suspiciousNodes)
     suspiciousNodes.sort((a,b) => a.health.status === "warn" ? -1 : 1)
     const sidebarItems = suspiciousNodes.map((node, i) => SidebarItem(node, i));
 

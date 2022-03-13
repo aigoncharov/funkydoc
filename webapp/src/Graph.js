@@ -90,6 +90,7 @@ function Graph(props) {
         .attr("stroke", "white")
         .attr("stroke-width", 3);
 
+      createLegend(svg, height, width)
 
       simulation.on("tick", () => {
         link.attr("d", linkArc);
@@ -98,10 +99,14 @@ function Graph(props) {
 
       // zoom & panning
       function handleZoom(e) {
-        d3.selectAll("g").attr("transform", e.transform);
+        d3.selectAll("g.legend").attr("opacity", 0.25)
+        d3.selectAll("g").filter(":not(.legend):not(.cell)").attr("transform", e.transform);
         node.attr("transform", (d) => `translate(${d.x},${d.y})`);
       }
-      const zoom = d3.zoom().on("zoom", handleZoom).scaleExtent([0.25, 2]);
+      const zoom = d3.zoom()
+        .on("zoom", handleZoom)
+        .on("end", () => d3.selectAll("g.legend").attr("opacity", 1))
+        .scaleExtent([0.25, 2]);
       svg.call(zoom);
 
       node
@@ -175,5 +180,55 @@ const drag = (simulation) => {
     .on('drag', dragged)
     .on('end', dragended)
 };
+
+function createLegend(svg, height, width) {
+  const legend = svg
+    .append("g")
+    .attr("class", "legend")
+    .attr('transform', "translate(" + (100+Math.pow(width, 0.6)) + "," + (75+Math.pow(height, 0.675)) + ")")
+
+  function addSymbol(text, color, y) {
+    const cell = legend
+      .append("g")
+      .attr("class", "cell")
+
+    cell
+      .append("circle")
+      .attr("class", "legend-node")
+      .attr("fill", color)
+      .attr("stroke", "black")
+      .attr("stroke-width", 1.5)
+      .attr("r", 2.5)
+      .attr("cy",  y)
+    cell
+      .append("text")
+      .attr("class", "legend-text")
+      .style("font-size", "6px")
+      .text(text)
+      .attr("alignment-baseline","middle")
+      .attr("y",  y)
+      .attr("x", 8)
+  }
+
+  addSymbol("Document page", "white", 0)
+  addSymbol("Unreferenced page", "#ffdf62", 15)
+  addSymbol("Isolated page", "#fc5776", 30)
+
+  const legendBody = legend
+    .append("g")
+    .attr("class", "cell")
+
+  legendBody
+    .append("rect")
+    .attr("width", 85)
+    .attr("height", 50)
+    .style("x", -10)
+    .style("y", -10)
+    .style("fill", "#737373")
+    .attr("opacity", 0.25)
+    .style("stroke-width", 1)
+    .style("stroke", "black")
+    .style("box-shadow", "0px 1px 2px rgba(0, 0, 0, 0.05);")
+}
 
 export default Graph;

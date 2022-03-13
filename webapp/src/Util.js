@@ -43,7 +43,6 @@ let persist = false;
 
 function overedImpl(_, d) {
   if (persist) return;
-  console.log(this)
   d3.select(this).attr("font-weight", "bold");
 
   const paths = d3.selectAll("path")
@@ -62,7 +61,9 @@ function overedImpl(_, d) {
   const adjacentNodeText =
     outgoing._groups[0].map(p => p?.__data__?.target?.id)
     .concat(incoming._groups[0].map(p => p?.__data__?.source.id))
-  const text = d3.selectAll("text").filter(t => !adjacentNodeText.includes(t.id) && t.id !== d.id)
+  const text = d3.selectAll("text")
+    .filter(":not(.legend-text)")
+    .filter(t => !adjacentNodeText.includes(t?.id) && t?.id !== d.id)
   text.style("visibility", "hidden")
 
   // hide non-adjacent markers
@@ -75,7 +76,8 @@ function overedImpl(_, d) {
 
   // grey out non-related nodes
   const nonrelatedNodes = d3.selectAll('circle')
-    .filter(n => !adjacentNodeText.includes(n.id) && n.id !== d.id)
+    .filter(":not(.legend-node)")
+    .filter(n => !adjacentNodeText.includes(n?.id) && n?.id !== d.id)
   nonrelatedNodes.attr("opacity", 0.25);
 }
 
@@ -105,7 +107,7 @@ function outedImpl(_, d) {
 
   // return arrowhead marker colors to default
   paths
-    .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id})`);
+    .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id}+${colorDefault})`);
 
   d3.selectAll('circle').attr("opacity", 1.0)
 }
