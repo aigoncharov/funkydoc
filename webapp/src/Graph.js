@@ -2,7 +2,7 @@ import { useD3 } from "./hooks/useD3";
 import React from "react";
 import {
   colorDefault, colorIncoming, colorOutgoing, colorNone,
-  createLinks, createNodes, getNodeColor, overedImpl, outedImpl, setPersist, flipPersist
+  createLinks, createNodes, getNodeColor, overedImpl, outedImpl, handleOnClick
 } from "./Util";
 import * as d3 from "d3";
 
@@ -28,7 +28,8 @@ function Graph(props) {
         .force("charge", d3.forceManyBody().strength(-data.length * 12))
         .force("radial", d3.forceRadial(radius, 0, 0))
         .force("x", d3.forceX())
-        .force("y", d3.forceY());
+        .force("y", d3.forceY())
+        .alphaDecay(0.05);
 
       // Blue arrowhead markers (points to a node)
       function createMarkers(color) {
@@ -88,7 +89,7 @@ function Graph(props) {
         .lower()
         .attr("fill", "none")
         .attr("stroke", "white")
-        .attr("stroke-width", 3);
+        .attr("stroke-width", 3)
 
       createLegend(svg, height, width)
 
@@ -96,6 +97,12 @@ function Graph(props) {
         link.attr("d", linkArc);
         node.attr("transform", (d) => `translate(${d.x},${d.y})`);
       });
+      simulation.on("end", () => {
+        node
+        .on("mouseover", overedImpl)  // highlight relevant paths
+        .on("mouseout", outedImpl)    // return to normal
+        .on("click", handleOnClick)     // persist highlights if clicked
+      })
 
       // zoom & panning
       function handleZoom(e) {
@@ -107,12 +114,11 @@ function Graph(props) {
         .on("zoom", handleZoom)
         .on("end", () => d3.selectAll("g.legend").attr("opacity", 1))
         .scaleExtent([0.25, 2]);
-      svg.call(zoom);
 
-      node
-      .on("mouseover", overedImpl)  // highlight relevant paths
-      .on("mouseout", outedImpl)    // return to normal
-      .on("click", flipPersist)     // persist highlights if clicked
+      svg
+        .call(zoom.transform, d3.zoomIdentity.scale(0.5))
+        .call(zoom)
+
     },
     [data.length]
   );

@@ -5,7 +5,9 @@ const colorDefault = "#1f77b4"
 const colorIncoming = "#00f"
 const colorOutgoing = "#f00"
 const colorNone = "#ccc"
+
 const data = processedOut.docs.nodes;
+const documentationURL = "https://www.internalfb.com/intern/staticdocs/flipper"
 
 function createLinks() {
   return data.flatMap((docNode) =>
@@ -81,8 +83,14 @@ function overedImpl(_, d) {
   nonrelatedNodes.attr("opacity", 0.25);
 }
 
-function flipPersist() {
+function handleOnClick(event, d) {
   setPersist(!persist);
+
+  // cmd+click to open document
+  if (d?.title !== null && event.metaKey === true) {
+    const url = documentationURL + d.title
+    window.open(url, '_blank');
+  }
 }
 
 function setPersist(bool) {
@@ -115,5 +123,5 @@ function outedImpl(_, d) {
 export {
   colorDefault, colorIncoming, colorOutgoing, colorNone,
   getData, getNodeColor, createLinks, createNodes, overedImpl, outedImpl,
-  setPersist, flipPersist
+  setPersist, handleOnClick
 };
