@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css'
 import * as d3 from "d3";
+import {overedImpl, outedImpl, setPersist} from "./Util";
 
 function Sidebar(props) {
     const suspiciousNodes = props.data.filter(node => node.health.status !== "success")
@@ -16,6 +17,7 @@ function Sidebar(props) {
 
 const SidebarItem = node => {
     const title = node.title;
+    const health = node.health.status === "warn" ? "low connectivity" : "isolated";
 
     function navigateToNode() {
         // find coordinates to navigate to
@@ -44,26 +46,23 @@ const SidebarItem = node => {
     }
 
     function highlightNode() {
-        d3.selectAll("text")
-            .filter(t => t.id !== node.id)
-            .style("visibility", "hidden")  // hide all text
-
+        setPersist(false);      // stop persisting any highlights if any
 
         const selectedNode = d3.selectAll('svg g')
             .filter(e => e?.title === node.title)
         selectedNode
             .attr("font-weight", "bold")
-            .style("visibility", "visible")
+
+        overedImpl(null, node);
     }
 
     function unhighlightNode() {
-        d3.selectAll("text").style("visibility", "visible")
-
         const selectedNode = d3.selectAll('svg g')
             .filter(e => e?.title === node.title)
         selectedNode
             .attr("font-weight", null)
-            .attr("stroke-width", 0.1)
+
+        outedImpl(null, node);
     }
 
     return (
@@ -74,7 +73,8 @@ const SidebarItem = node => {
             onMouseEnter={highlightNode}
             onMouseLeave={unhighlightNode}
         >
-            {title}
+            <h3 className="SidebarItemTitle">{title}</h3>
+            <h5 className="SidebarItemSubtitle">{health}</h5>
         </div>
     );
 }

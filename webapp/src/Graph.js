@@ -1,17 +1,15 @@
 import { useD3 } from "./hooks/useD3";
 import React from "react";
-import { createLinks, createNodes, getNodeColor } from "./Util";
+import {
+  colorDefault, colorIncoming, colorOutgoing, colorNone,
+  createLinks, createNodes, getNodeColor, overedImpl, outedImpl, setPersist, flipPersist
+} from "./Util";
 import * as d3 from "d3";
 
 function Graph(props) {
   const data = props.data;
   const nodes = createNodes(data);
   const links = createLinks(data);
-
-  const colorDefault = "#1f77b4"
-  const colorIncoming = "#00f"
-  const colorOutgoing = "#f00"
-  const colorNone = "#ccc"
 
   let persist = false;
 
@@ -108,76 +106,10 @@ function Graph(props) {
       const zoom = d3.zoom().on("zoom", handleZoom).scaleExtent([0.25, 2]);
       svg.call(zoom);
 
-      // highlight paths on hover in
-      function overed(event, d) {
-        if (persist) return;
-        d3.select(this).attr("font-weight", "bold");
-
-        const paths = d3.selectAll("path")
-        const outgoing = paths.filter(p => p?.source?.id === d.id)
-        const incoming = paths.filter(p => p?.target?.id === d.id)
-        // highlight paths and grey out non-related paths
-        paths.attr("stroke", colorNone)
-        outgoing
-          .raise()
-          .attr("stroke", colorOutgoing)
-        incoming
-          .raise()
-          .attr("stroke", colorIncoming)
-
-        // hide non-adjacent node text
-        const adjacentNodeText =
-          outgoing._groups[0].map(p => p?.__data__?.target?.id)
-          .concat(incoming._groups[0].map(p => p?.__data__?.source.id))
-        const text = d3.selectAll("text").filter(t => !adjacentNodeText.includes(t.id) && t.id !== d.id)
-        text.style("visibility", "hidden")
-
-        // hide non-adjacent markers
-        const markers = d3.selectAll("marker").filter(m => m?.source?.id !== d.id && m?.target?.id !== d.id)
-        markers.style("visibility", "hidden")
-
-        // change outgoing & incoming arrowhead markers
-        outgoing.attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id}+${colorOutgoing})`);
-        incoming.attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id}+${colorIncoming})`);
-
-        // grey out non-related nodes
-        const nonrelatedNodes = d3.selectAll('circle')
-          .filter(n => !adjacentNodeText.includes(n.id) && n.id !== d.id)
-        nonrelatedNodes.attr("opacity", 0.25);
-      }
-
-      function click(event, d) {
-        persist = !persist;
-      }
-
-      // reset on hover out
-      function outed(event, d) {
-        if (persist) return;
-        d3.select(this).attr("font-weight", null);
-
-        const paths = d3.selectAll("path")
-        // return to default
-        paths.attr("stroke", colorDefault)
-
-        // reveal all node text
-        const text = d3.selectAll("text")
-        text.style("visibility", "visible")
-
-        // hide non-adjacent markers
-        const marker = d3.selectAll("marker")
-        marker.style("visibility", "visible")
-
-        // return arrowhead marker colors to default
-        paths
-          .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id})`);
-
-        d3.selectAll('circle').attr("opacity", 1.0)
-      }
-
       node
-      .on("mouseover", overed)
-      .on("mouseout", outed)
-      .on("click", click)
+      .on("mouseover", overedImpl)  // highlight relevant paths
+      .on("mouseout", outedImpl)    // return to normal
+      .on("click", flipPersist)     // persist highlights if clicked
     },
     [data.length]
   );
