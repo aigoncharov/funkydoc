@@ -11,8 +11,6 @@ function Graph(props) {
   const nodes = createNodes(data);
   const links = createLinks(data);
 
-  let persist = false;
-
   const ref = useD3(
     (svg) => {
       const svgElement = svg._groups[0][0].getBoundingClientRect();
@@ -27,7 +25,7 @@ function Graph(props) {
           "link",
           d3.forceLink(links).id((d) => d.id)
         )
-        .force("charge", d3.forceManyBody().strength(-data.length * 10))
+        .force("charge", d3.forceManyBody().strength(-data.length * 12))
         .force("radial", d3.forceRadial(radius, 0, 0))
         .force("x", d3.forceX())
         .force("y", d3.forceY());

@@ -5,7 +5,9 @@ import {overedImpl, outedImpl, setPersist} from "./Util";
 
 function Sidebar(props) {
     const suspiciousNodes = props.data.filter(node => node.health.status !== "success")
-    const sidebarItems = suspiciousNodes.map(node => SidebarItem(node));
+    console.log(suspiciousNodes)
+    suspiciousNodes.sort((a,b) => a.health.status === "warn" ? -1 : 1)
+    const sidebarItems = suspiciousNodes.map((node, i) => SidebarItem(node, i));
 
     return(
         <div className="SidebarRoot">
@@ -15,9 +17,9 @@ function Sidebar(props) {
 }
 
 
-const SidebarItem = node => {
+const SidebarItem = (node, i) => {
     const title = node.title;
-    const health = node.health.status === "warn" ? "low connectivity" : "isolated";
+    const health = node.health.status === "warn" ? "Not referenced" : "Isolated";
 
     function navigateToNode() {
         // find coordinates to navigate to
@@ -67,7 +69,7 @@ const SidebarItem = node => {
 
     return (
         <div
-            key={node.id}
+            key={i}
             className="SidebarItem"
             onClick={navigateToNode}
             onMouseEnter={highlightNode}
