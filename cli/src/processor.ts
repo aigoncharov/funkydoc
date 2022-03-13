@@ -52,7 +52,7 @@ export const process = ({ entryPoint, nodes }: ParserOutput, config: Config): Pr
     .map((node) => ({
       ...node,
       edgesIn: node.edgesIn.filter((node) => node.startsWith('/docs/')),
-      edgesOut: node.edgesIn.filter((node) => node.startsWith('/docs/')),
+      edgesOut: node.edgesOut.filter((node) => node.startsWith('/docs/')),
     }))
 
   nodesProcessed
