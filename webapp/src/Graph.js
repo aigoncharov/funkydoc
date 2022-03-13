@@ -35,38 +35,27 @@ function Graph(props) {
         .force("y", d3.forceY());
 
       // Blue arrowhead markers (points to a node)
-      svg
-        .append("defs")
-        .selectAll("marker")
-        .data(links)
-        .join("marker")
-        .attr("id", (d) => `arrow-${d.source.id}+${d.target.id}`)
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 15)
-        .attr("refY", -0.5)
-        .attr("markerWidth", 4)
-        .attr("markerHeight", 4)
-        .attr("orient", "auto")
-        .append("path")
-        .attr("fill", colorDefault)
-        .attr("d", "M0,-5L10,0L0,5");
-
-        // Red arrowhead markers
+      function createMarkers(color) {
         svg
-        .append("defs")
-        .selectAll("marker")
-        .data(links)
-        .join("marker")
-        .attr("id", (d) => `arrow-${d.source.id}+${d.target.id}-red`)
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", 15)
-        .attr("refY", -0.5)
-        .attr("markerWidth", 4)
-        .attr("markerHeight", 4)
-        .attr("orient", "auto")
-        .append("path")
-        .attr("fill", colorOutgoing)
-        .attr("d", "M0,-5L10,0L0,5");
+          .append("defs")
+          .selectAll("marker")
+          .data(links)
+          .join("marker")
+          .attr("id", (d) => `arrow-${d.source.id}+${d.target.id}+${color}`)
+          .attr("viewBox", "0 -5 10 10")
+          .attr("refX", 15)
+          .attr("refY", -0.5)
+          .attr("markerWidth", 4)
+          .attr("markerHeight", 4)
+          .attr("orient", "auto")
+          .append("path")
+          .attr("fill", color)
+          .attr("d", "M0,-5L10,0L0,5");
+      }
+
+      for (const color of [colorDefault, colorIncoming, colorOutgoing]){
+        createMarkers(color)
+      }
 
       const link = svg
         .append("g")
@@ -76,7 +65,7 @@ function Graph(props) {
         .data(links)
         .join("path")
         .attr("stroke", colorDefault)
-        .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id})`);
+        .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id}+${colorDefault})`);
 
       const node = svg
         .append("g")
@@ -127,7 +116,7 @@ function Graph(props) {
         const paths = d3.selectAll("path")
         const outgoing = paths.filter(p => p?.source?.id === d.id)
         const incoming = paths.filter(p => p?.target?.id === d.id)
-        // highlight paths
+        // highlight paths and grey out non-related paths
         paths.attr("stroke", colorNone)
         outgoing
           .raise()
@@ -147,9 +136,14 @@ function Graph(props) {
         const markers = d3.selectAll("marker").filter(m => m?.source?.id !== d.id && m?.target?.id !== d.id)
         markers.style("visibility", "hidden")
 
-        // change outgoing arrowhead markers to red
-        outgoing
-          .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id}-red)`);
+        // change outgoing & incoming arrowhead markers
+        outgoing.attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id}+${colorOutgoing})`);
+        incoming.attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id}+${colorIncoming})`);
+
+        // grey out non-related nodes
+        const nonrelatedNodes = d3.selectAll('circle')
+          .filter(n => !adjacentNodeText.includes(n.id) && n.id !== d.id)
+        nonrelatedNodes.attr("opacity", 0.25);
       }
 
       function click(event, d) {
@@ -176,6 +170,8 @@ function Graph(props) {
         // return arrowhead marker colors to default
         paths
           .attr("marker-end", (d) => `url(#arrow-${d.source.id}+${d.target.id})`);
+
+        d3.selectAll('circle').attr("opacity", 1.0)
       }
 
       node
